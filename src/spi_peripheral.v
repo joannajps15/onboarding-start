@@ -52,7 +52,7 @@ module spi_peripheral (
     wire high = ~r_sclk[2] & r_sclk[1];
     wire low = r_sclk[2] & ~r_sclk[1];
     reg count_enable;
-    
+
     // CAPTURE 16-BITS
     always @ (posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -93,6 +93,7 @@ module spi_peripheral (
                     7'h02: en_reg_pwm_7_0 <= temp[7:0];
                     7'h03: en_reg_pwm_15_8 <= temp[7:0];
                     7'h04: pwm_duty_cycle <= temp[7:0];
+                    default: ;
                 endcase                
                 //finished processing: reset signals            
                 count_enable <= 1;

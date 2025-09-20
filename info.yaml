@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "ASIC Onboarding Project - Joanna"
+  titles:        "ASIC Onboarding Project - Joanna"
   author:       "Joanna Sebastiampillai"
   description:  "SPI-controlled PWM peripheral for Tiny Tapeout."
 #  language:     "Verilog"

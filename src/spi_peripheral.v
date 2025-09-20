@@ -27,9 +27,9 @@ module spi_peripheral (
 
     always @ (posedge clk) begin
         if (rst_n) begin
-            r_sclk[2:0] = 3'b000;
-            r_ncs[1:0] = 2'b00;
-            r_copi[1:0] = 2'b00;
+            r_sclk[2:0] <= 3'b000;
+            r_ncs[1:0] <= 2'b00;
+            r_copi[1:0] <= 2'b00;
         end else begin
             //STAGE ONE
             r_sclk[0] <= sclk;
@@ -50,10 +50,12 @@ module spi_peripheral (
     reg [4:0] count = 0; //(3) BIT COUNTING
     reg [15:0] temp = 0; //data temp
     wire high = ~r_sclk[2] & r_sclk[1];
+    wire count_enable = 1;
 
     always @ (posedge clk) begin
         if (rst_n) begin
             //reset signals
+            count_enable <= 1;
             count <= 0;
             temp <= 0;
             en_reg_out_7_0 <= 0;
@@ -64,16 +66,20 @@ module spi_peripheral (
         end else begin 
             if (~r_ncs[1]) begin
                 //get values
-                if ((~r_sclk[2] & r_sclk[1])) begin
+                if (count_enable && ~r_sclk[2] & r_sclk[1]) begin
                     temp[15-count] <= r_copi[1];
                     count <= count + 1;
+                    count_enable <= 0;
+                end else if (r_sclk[2] & ~r_sclk[1]) begin
+                    count_enable <= 1;
                 end
             end else begin
                 //reset signals
+                count_enable <= 1;
                 temp <= 0;
                 count <= 0;
             end
-            
+
             if (count == 5'd16) begin
                 if ((temp[15] == 1) && (temp[14:8] <= max_address)) begin
                     case (temp[14:8])

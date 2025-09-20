@@ -83,11 +83,11 @@ module spi_peripheral (
             if (count == 5'd16) begin
                 if ((temp[15] == 1) && (temp[14:8] <= max_address)) begin
                     case (temp[14:8])
-                        7'h00: en_reg_out_7_0 <= {temp[7:1]};
-                        7'h01: en_reg_out_15_8 <= {temp[7:1]};
-                        7'h02: en_reg_pwm_7_0 <= {temp[7:1]};
-                        7'h03: en_reg_pwm_15_8 <= {temp[7:1]};
-                        7'h04: pwm_duty_cycle <= {temp[7:1]};
+                        7'h00: en_reg_out_7_0 <= temp[7:0];
+                        7'h01: en_reg_out_15_8 <= temp[7:0];
+                        7'h02: en_reg_pwm_7_0 <= temp[7:0];
+                        7'h03: en_reg_pwm_15_8 <= temp[7:0];
+                        7'h04: pwm_duty_cycle <= temp[7:0];
                     endcase
                 end
                 count <= 0;

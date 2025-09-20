@@ -26,6 +26,7 @@ module tt_um_uwasic_onboarding_joanna (
   // Instantiate the SPI module
   spi_peripheral spi_peripheral_inst (
     .clk(clk),
+    .rst_n(rst_n),
     .sclk(ui_in[0]),
     .ncs(ui_in[2]),
     .copi(ui_in[1]),

@@ -66,25 +66,28 @@ module spi_peripheral (
                 //get values
                 if ((~r_sclk[2] & r_sclk[1])) begin
                     temp[15-count] <= r_copi[1];
-                    if (count == 5'd15) begin
-                        if (temp[15] && temp[14:8] <= max_address) begin
-                            case (temp[14:8])
-                                7'h00: en_reg_out_7_0 <= temp[7:0];
-                                7'h01: en_reg_out_15_8 <= temp[7:0];
-                                7'h02: en_reg_pwm_7_0 <= temp[7:0];
-                                7'h03: en_reg_pwm_15_8 <= temp[7:0];
-                                7'h04: pwm_duty_cycle <= temp[7:0];
-                            endcase
-                        end
-                        count <= 0;
-                        temp <= 0;
-                    end else count <= count + 1;
+                    count <= count + 1;
                 end
             end else begin
                 //reset signals
+                temp <= 0;
+                count <= 0;
+            end
+            
+            if (count == 5'd16) begin
+                if ((temp[15] == 1) && (temp[14:8] <= max_address)) begin
+                    case (temp[14:8])
+                        7'h00: en_reg_out_7_0 <= {temp[7:1]};
+                        7'h01: en_reg_out_15_8 <= {temp[7:1]};
+                        7'h02: en_reg_pwm_7_0 <= {temp[7:1]};
+                        7'h03: en_reg_pwm_15_8 <= {temp[7:1]};
+                        7'h04: pwm_duty_cycle <= {temp[7:1]};
+                    endcase
+                end
                 count <= 0;
                 temp <= 0;
-            end
+            end 
+            
         end
     end
 

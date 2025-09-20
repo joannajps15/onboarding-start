@@ -9,7 +9,7 @@ project:
   tiles: "1x1"        
   top_module:  "tt_um_uwasic_onboarding_joanna"
   source_files:
-  - "spi peripheral"
+  - spi_peripheral.v
   - pwm_peripheral.v  
   - project.v
 

@@ -1,11 +1,12 @@
 # Tiny Tapeout project information
 project:
-  titles:        "ASIC Onboarding Project - Joanna"
+  title:        "ASIC Onboarding Project - Joanna"
+  titles:       "" #not sure why this is giving an error
   author:       "Joanna Sebastiampillai"
   description:  "SPI-controlled PWM peripheral for Tiny Tapeout."
-#  language:     "Verilog"
-#  clock_hz:     0       
-#   tiles: "1x1"        
+  language:     "Verilog"
+  clock_hz:     0       
+  tiles: "1x1"        
   top_module:  "tt_um_uwasic_onboarding_joanna"
   source_files:
   - "spi peripheral"

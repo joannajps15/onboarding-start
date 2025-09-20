@@ -7,7 +7,7 @@
 
 module spi_peripheral (
     input wire clk, //peripheral clock
-    input wire rst_n;
+    input wire rst_n,
     input wire sclk, //serial clock
     input wire ncs, //active-low chip-select
     input wire copi, //controller out, peripheral in

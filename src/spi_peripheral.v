@@ -24,14 +24,12 @@ module spi_peripheral (
     output reg [7:0] pwm_duty_cycle
 );
 
-    //(1) SYNCHRONIZE
-
-    //synchronizing FFs
+    // SIGNAL SYNCHRONIZATION
     reg [2:0] r_sclk;
     reg [1:0] r_ncs;
     reg [1:0] r_copi;
 
-    always @ (posedge clk) begin
+    always @ (posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             r_sclk[2:0] <= 3'b000;
             r_ncs[1:0] <= 2'b00;
@@ -60,12 +58,18 @@ module spi_peripheral (
     reg count_enable;
 
     // CAPTURE 16-BITS
-    always @ (posedge clk) begin
+    always @ (posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             //reset signals
             count_enable <= 1;
             count <= 0;
             temp <= 0;      
+            
+            en_reg_out_7_0 <= 0;
+            en_reg_out_15_8 <= 0;
+            en_reg_pwm_7_0 <= 0;
+            en_reg_pwm_15_8 <= 0;
+            pwm_duty_cycle <= 0;    
         end else if (~r_ncs[1]) begin
             //get values
             if (count_enable && high) begin
@@ -75,24 +79,7 @@ module spi_peripheral (
             end else if (low) begin
                 count_enable <= 1;
             end
-        end else begin
-            //reset signals
-            count_enable <= 1;
-            temp <= 0;
-            count <= 0;
-        end 
-    end
-
-    always @ (posedge clk) begin
-        if (!rst_n) begin
-            //reset signals
-            en_reg_out_7_0 <= 0;
-            en_reg_out_15_8 <= 0;
-            en_reg_pwm_7_0 <= 0;
-            en_reg_pwm_15_8 <= 0;
-            pwm_duty_cycle <= 0;      
-        end else begin 
-            if ((count == 5'd16) && (temp[15] == 1) && (temp[14:8] <= max_address)) begin
+        end else if ((count == 5'd16) && (temp[15] == 1) && (temp[14:8] <= max_address)) begin
                 case (temp[14:8])
                     7'h00: en_reg_out_7_0 <= temp[7:0];
                     7'h01: en_reg_out_15_8 <= temp[7:0];
@@ -105,8 +92,12 @@ module spi_peripheral (
                 count_enable <= 1;
                 temp <= 0;
                 count <= 0;
-            end
-        end
+        end else begin
+            //reset signals
+            count_enable <= 1;
+            temp <= 0;
+            count <= 0;
+        end 
     end
 
 endmodule

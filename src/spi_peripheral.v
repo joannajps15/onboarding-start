@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// STEPS TO DEBUG
+
+// all bit-widths are correctly declared
+// negedge rst_n might not be supported?
+// width mismatches
+
 `default_nettype none
 
 module spi_peripheral (
@@ -25,7 +31,7 @@ module spi_peripheral (
     reg [1:0] r_ncs;
     reg [1:0] r_copi;
 
-    always @ (posedge clk or negedge rst_n) begin
+    always @ (posedge clk) begin
         if (!rst_n) begin
             r_sclk[2:0] <= 3'b000;
             r_ncs[1:0] <= 2'b00;
@@ -54,7 +60,7 @@ module spi_peripheral (
     reg count_enable;
 
     // CAPTURE 16-BITS
-    always @ (posedge clk or negedge rst_n) begin
+    always @ (posedge clk) begin
         if (!rst_n) begin
             //reset signals
             count_enable <= 1;
@@ -77,7 +83,7 @@ module spi_peripheral (
         end 
     end
 
-    always @ (posedge clk or negedge rst_n) begin
+    always @ (posedge clk) begin
         if (!rst_n) begin
             //reset signals
             en_reg_out_7_0 <= 0;

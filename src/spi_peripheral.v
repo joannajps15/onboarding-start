@@ -2,13 +2,7 @@
  * Copyright (c) 2024 Joanna Sebastiampillai
  * SPDX-License-Identifier: Apache-2.0
  */
-
-// STEPS TO DEBUG
-
-// all bit-widths are correctly declared
-// negedge rst_n might not be supported?
-// width mismatches
-
+ 
 `default_nettype none
 
 module spi_peripheral (

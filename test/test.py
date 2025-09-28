@@ -6,7 +6,6 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
 from cocotb.triggers import FallingEdge
 from cocotb.triggers import ClockCycles
-from cocotb.triggers import Edge
 from cocotb.types import Logic
 from cocotb.types import LogicArray
 
@@ -152,22 +151,22 @@ async def test_spi(dut):
     dut._log.info("SPI test completed successfully")
 
 # Rising Edge Detection
-async def rising_edge(signal, index):
+async def rising_edge(dut, signal, index):
     """Wait for the signal to go high"""
-    a = signal[index].value
+    a = int(signal[index].value)
     while True:
-        await signal.value_change
-        b = signal[index].value
+        await ClockCycles(dut.clk, 1)
+        b = int(signal[index].value)
         if a == 0 and b == 1:
             return
         a = b
 
 # Falling Edge Detection
-async def falling_edge(signal, index):
+async def falling_edge(dut, signal, index):
     """Wait for the signal to go high"""
     a = signal[index].value
-    while True:
-        await signal.value_change
+    while True:        
+        await ClockCycles(dut.clk, 1)
         b = signal[index].value
         if a == 1 and b == 0:
             return
@@ -199,11 +198,11 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0x01)  # Write transaction
-    await rising_edge(dut.uo_out, 0)
+    await rising_edge(dut, dut.uo_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     
-    await rising_edge(dut.uo_out, 0)
+    await rising_edge(dut, dut.uo_out, 0)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
 
@@ -217,10 +216,10 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x03, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     await send_spi_transaction(dut, 1, 0x03, 0x01)  # Write transaction    
-    await rising_edge(dut.uio_out, 0)
+    await rising_edge(dut, dut.uio_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     
-    await rising_edge(dut.uio_out, 0)
+    await rising_edge(dut, dut.uio_out, 0)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
 
     period = (t_rising_edge2 - t_rising_edge1) * 1e-9

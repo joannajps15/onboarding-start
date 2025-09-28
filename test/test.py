@@ -152,28 +152,26 @@ async def test_spi(dut):
     dut._log.info("SPI test completed successfully")
 
 # Rising Edge Detection
-async def rising_edge(signal):
+async def rising_edge(signal, index):
     """Wait for the signal to go high"""
-    a = signal.value
+    a = signal[index].value
     while True:
         await signal.value_change
-        b = signal.value
+        b = signal[index].value
         if a == 0 and b == 1:
             return
         a = b
-    return    
 
 # Falling Edge Detection
-async def falling_edge(signal):
+async def falling_edge(signal, index):
     """Wait for the signal to go high"""
-    a = signal.value
+    a = signal[index].value
     while True:
         await signal.value_change
-        b = signal.value
+        b = signal[index].value
         if a == 1 and b == 0:
             return
-        a = b
-    return    
+        a = b 
 
 # Frequency verification (~3 kHz +/- 1%).
 @cocotb.test()
@@ -201,11 +199,11 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0x01)  # Write transaction
-    await rising_edge(dut.uo_out[0])
+    await rising_edge(dut.uo_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     
-    await rising_edge(dut.uo_out[0])
+    await rising_edge(dut.uo_out, 0)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
 
@@ -219,10 +217,10 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x03, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     await send_spi_transaction(dut, 1, 0x03, 0x01)  # Write transaction    
-    await rising_edge(dut)
+    await rising_edge(dut.uio_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     
-    await rising_edge(dut)
+    await rising_edge(dut.uio_out, 0)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
 
     period = (t_rising_edge2 - t_rising_edge1) * 1e-9

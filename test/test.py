@@ -152,7 +152,7 @@ async def test_spi(dut):
 # Frequency verification (~3 kHz +/- 1%).
 @cocotb.test()
 async def test_pwm_freq(dut):
-    dut.log.info("Start PWM Frequency test")
+    dut._log.info("Start PWM Frequency test")
 
     # Set the clock period to 100 ns (10 MHz)
     clock = Clock(dut.clk, 100, units="ns")

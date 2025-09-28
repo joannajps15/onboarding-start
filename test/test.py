@@ -175,17 +175,16 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0x01)  # Write transaction
-    await RisingEdge(dut.uo_out[0])
+    await RisingEdge(dut.uo_out)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     
-    await RisingEdge(dut.uo_out[0])
+    await RisingEdge(dut.uo_out)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
 
     period = (t_rising_edge2 - t_rising_edge1) * 1e-9
     freq_1 = 1/period
     assert (freq_1 >= 2970 and freq_1 <= 3030) , f"Expected frequency within 3 kHz (1% tolerance), got {freq_1}"
     await ClockCycles(dut.clk, 1000) 
-
 
     #uio_out PWM signal test
     dut._log.info("Write transaction, address 0x03, data 0x01")

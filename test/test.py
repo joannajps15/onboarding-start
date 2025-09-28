@@ -201,11 +201,11 @@ async def test_pwm_freq(dut):
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
     ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0x01)  # Write transaction
-    await rising_edge(dut)
+    await rising_edge(dut.uo_out[0])
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     
-    await rising_edge(dut)
+    await rising_edge(dut.uo_out[0])
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
 

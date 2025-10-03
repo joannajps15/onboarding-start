@@ -160,6 +160,7 @@ async def rising_edge(dut, signal, index):
         if prev == 0 and curr == 1:
             return
         prev = curr
+        dut._log.info("rising edge not detected")
 
 # Falling Edge Detection
 async def falling_edge(dut, signal, index):
@@ -193,13 +194,18 @@ async def test_pwm_freq(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
 
+    # Enable ALL PORTS
+    await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
+    await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Enable PWM on uo_out
+    await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Enable Output on uio_out
+    await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Enable PWM on uio_out
+    await send_spi_transaction(dut, 1, 0x04, 0x64)  # Set Duty Cycle on bit 0 (100/255 ~ 40%)
+    await ClockCycles(dut.clk, 5)
+
     # Send Signals to SPI Peripheral and Analyze Values in output
     # uo_out PWM signal test
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
-    await send_spi_transaction(dut, 1, 0x00, 0x01)  # Enable Output on bit 0
-    await send_spi_transaction(dut, 1, 0x02, 0x01)  # Enable PWM on bit 0
-    await send_spi_transaction(dut, 1, 0x04, 0x64)  # Set Duty Cycle on bit 0 (100/255 ~ 40%)
 
     await rising_edge(dut, dut.uo_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")

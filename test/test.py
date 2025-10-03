@@ -154,7 +154,7 @@ async def test_spi(dut):
 async def rising_edge(signal):
     """Wait for the signal to go high"""
     while True:
-        await RisingEdge(signal)
+
     # a = int(signal.value[index])
     # while True:
     #     await ClockCycles(dut.clk, 1)
@@ -199,12 +199,15 @@ async def test_pwm_freq(dut):
     # uo_out PWM signal test
     dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
-    ui_in_val = await send_spi_transaction(dut, 1, 0x02, 0x01)  # Write transaction
-    await cocotb.triggers.RisingEdge(dut.uo_out.value[0])
+    await send_spi_transaction(dut, 1, 0x00, 0x01)  # Enable Output on bit 0
+    await send_spi_transaction(dut, 1, 0x02, 0x01)  # Enable PWM on bit 0
+    await send_spi_transaction(dut, 1, 0x04, 0x64)  # Set Duty Cycle on bit 0 (100/255 ~ 40%)
+
+    await RisingEdge(dut.uo_out[0])
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     
-    await cocotb.triggers.RisingEdge(dut.uo_out.value[0])
+    await cocotb.triggers.RisingEdge(dut.uo_out[0])
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
 

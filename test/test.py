@@ -150,18 +150,16 @@ async def test_spi(dut):
 
     dut._log.info("SPI test completed successfully")
 
-# # Rising Edge Detection
-# async def rising_edge(signal):
-#     """Wait for the signal to go high"""
-#     while True:
-
-    # a = int(signal.value[index])
-    # while True:
-    #     await ClockCycles(dut.clk, 1)
-    #     b = int(signal.value[index])
-    #     if a == 0 and b == 1:
-    #         return
-    #     a = b
+# Rising Edge Detection
+async def rising_edge(dut, signal, index):
+    """Wait for the signal to go high"""
+    prev = int(signal.value[index])
+    while True:
+        await ClockCycles(dut.clk, 1)
+        curr = int(signal.value[index])
+        if prev == 0 and curr == 1:
+            return
+        prev = curr
 
 # Falling Edge Detection
 async def falling_edge(dut, signal, index):
@@ -203,7 +201,7 @@ async def test_pwm_freq(dut):
     await send_spi_transaction(dut, 1, 0x02, 0x01)  # Enable PWM on bit 0
     await send_spi_transaction(dut, 1, 0x04, 0x64)  # Set Duty Cycle on bit 0 (100/255 ~ 40%)
 
-    await RisingEdge(dut.uo_out[0])
+    await rising_edge(dut, dut.uo_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     

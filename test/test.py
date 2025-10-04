@@ -155,7 +155,7 @@ async def rising_edge(dut, signal, index):
     """Wait for the signal to go high"""
     prev = int(signal.value) & 1
     while True:
-        await ClockCycles(dut.clk, 1)
+        # await ClockCycles(dut.clk, 1)
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             return
@@ -194,8 +194,16 @@ async def test_pwm_freq(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
 
+    # Reset ALL PORTS
+    await send_spi_transaction(dut, 1, 0x00, 0x00)  # Enable Output on uo_out
+    await send_spi_transaction(dut, 1, 0x02, 0x00)  # Enable PWM on uo_out
+    await send_spi_transaction(dut, 1, 0x01, 0x00)  # Enable Output on uio_out
+    await send_spi_transaction(dut, 1, 0x03, 0x00)  # Enable PWM on uio_out
+    await send_spi_transaction(dut, 1, 0x04, 0x00)  # Set Duty Cycle (50% of 255)
+    await ClockCycles(dut.clk, 10)
+
     # Enable ALL PORTS
-    # await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
+    await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
     await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Enable PWM on uo_out
     # await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Enable Output on uio_out
     # await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Enable PWM on uio_out
@@ -204,9 +212,7 @@ async def test_pwm_freq(dut):
 
     # Send Signals to SPI Peripheral and Analyze Values in output
     # uo_out PWM signal test
-    dut._log.info("Write transaction, address 0x02, data 0x01")
     dut._log.info("Observe PWM on uo_out[7:0]")
-
     await rising_edge(dut, dut.uo_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")

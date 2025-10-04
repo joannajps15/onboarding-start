@@ -155,7 +155,7 @@ async def rising_edge(dut, signal, index):
     """Wait for the signal to go high"""
     prev = int(signal.value) & 1
     while True:
-        # await ClockCycles(dut.clk, 1)
+        await ClockCycles(dut.clk, 5)
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             return

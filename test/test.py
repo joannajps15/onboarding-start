@@ -159,9 +159,10 @@ async def rising_edge(dut, signal):
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             dut._log.info("rising edge detected!!")
-            return
+            return        
+        dut._log.info(f"prev: {prev} | curr: {curr}")
         prev = curr
-
+        
 # Falling Edge Detection
 async def falling_edge(dut, signal):
     """Wait for the signal to go high"""

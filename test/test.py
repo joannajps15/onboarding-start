@@ -159,7 +159,6 @@ async def rising_edge(dut, signal):
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             return        
-        # dut._log.info(f"prev: {prev} | curr: {curr}")
         prev = curr
         
 # Falling Edge Detection
@@ -171,7 +170,6 @@ async def falling_edge(dut, signal):
         curr = int(signal.value) & 1
         if prev == 1 and curr == 0:
             return
-        # dut._log.info(f"prev: {prev} | curr: {curr}")
         prev = curr
 
 # Frequency verification (~3 kHz +/- 1%).
@@ -286,6 +284,16 @@ async def test_pwm_duty(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
 
+    # CASE 0 - VERIFY SIGNAL STAYS LOW
+    # uo_out PWM signal test - constantly 0
+    dut._log.info("Duty Cycle: 0")
+    await send_spi_transaction(dut, 1, 0x04, 0x00)  # Update duty cycle
+    await ClockCycles(dut.clk, 10) # Buffer for duty cycle update
+    for i in range(20):
+        await ClockCycles(dut.clk, 1)
+        read = int(dut.uo_out.value) & 1 # read value of signal
+        assert (read == 0), "Expected PWM duty cycle of 0, signal toggled"
+
     # Enable ALL PORTS
     await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
     await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Enable PWM on uo_out
@@ -294,7 +302,7 @@ async def test_pwm_duty(dut):
     await ClockCycles(dut.clk, 5)
 
     # Send Signals to SPI Peripheral and Analyze Duty Cycle from output
-    for i in range(0, 255, 5):
+    for i in range(5, 255, 5):
         dut._log.info(f"Duty Cycle: {i}")
         await send_spi_transaction(dut, 1, 0x04, i)  # Update duty cycle
         await ClockCycles(dut.clk, 5) # Buffer for duty cycle update
@@ -304,26 +312,15 @@ async def test_pwm_duty(dut):
 
         #uio_out PWM signal test
         await duty_cycle_calc(dut, 0, i)    
-    
-    # special case for 255
-    # uo_out PWM signal test
-    dut._log.info("Duty Cycle: 255") 
-    await send_spi_transaction(dut, 1, 0x03, 0x00) # not PWM mode
-    await ClockCycles(dut.clk, 5) # buffer for update
 
-    await rising_edge(dut, dut.uio_out, 0)
-    t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
-    
-    await falling_edge(dut, dut.uio_out, 0)
-    t_falling_edge = cocotb.utils.get_sim_time(units="ns")
+    # CASE 255 - VERIFY SIGNAL STAYS HIGH
+    # uo_out PWM signal test - constantly 1
+    dut._log.info("Duty Cycle: 255")
+    await send_spi_transaction(dut, 1, 0x04, 0xFF)  # Update duty cycle
+    await ClockCycles(dut.clk, 10) # Buffer for duty cycle update
+    for i in range(20):
+        await ClockCycles(dut.clk, 1)
+        read = int(dut.uo_out.value) & 1 # read value of signal
+        assert (read == 1), "Expected PWM duty cycle of 1, signal toggled"
 
-    await rising_edge(dut, dut.uio_out, 0)
-    t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
- 
-    high_time = t_falling_edge - t_rising_edge1
-    period = t_rising_edge2 - t_rising_edge1
-    duty_cycle = (high_time / period) * 100
-    pwm_duty_cycle = 100
-    assert ((duty_cycle >= pwm_duty_cycle*0.99) and (duty_cycle <= pwm_duty_cycle*1.01)) , f"Expected PWM duty cycle of 100%, got {duty_cycle}%"
-    
     dut._log.info("PWM Duty Cycle test completed successfully")

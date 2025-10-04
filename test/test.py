@@ -246,10 +246,12 @@ async def duty_cycle_calc(dut, mode, pwm_duty_cycle):
     t_falling_edge = cocotb.utils.get_sim_time(units="ns")
 
     if mode: 
-        await rising_edge(dut, dut.uo_out, 0)
+        await rising_edge(dut, dut.uo_out)
     else: 
-        await rising_edge(dut, dut.uio_out, 0)
+        await rising_edge(dut, dut.uio_out)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
+
+    dut._log.info("times calculated successfully")
 
     high_time = t_falling_edge - t_rising_edge1
     period = t_rising_edge2 - t_rising_edge1

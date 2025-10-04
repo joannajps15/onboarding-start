@@ -101,7 +101,7 @@ async def test_spi(dut):
     dut.ui_in.value = ui_in_logicarray(ncs, bit, sclk)
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
+    dut.rst_n.value = 1 
     await ClockCycles(dut.clk, 5)
 
     dut._log.info("Test project behavior")
@@ -153,14 +153,14 @@ async def test_spi(dut):
 # Rising Edge Detection
 async def rising_edge(dut, signal, index):
     """Wait for the signal to go high"""
-    prev = int(signal.value[index])
+    prev = int(signal.value) & 1
     while True:
         await ClockCycles(dut.clk, 1)
-        curr = int(signal.value[index])
+        curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             return
         prev = curr
-        dut._log.info("rising edge not detected")
+        dut._log.info(f"prev = {prev} | curr = {curr}")
 
 # Falling Edge Detection
 async def falling_edge(dut, signal, index):

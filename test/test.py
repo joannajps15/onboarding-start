@@ -195,10 +195,10 @@ async def test_pwm_freq(dut):
     await ClockCycles(dut.clk, 5)
 
     # Enable ALL PORTS
-    await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
+    # await send_spi_transaction(dut, 1, 0x00, 0xFF)  # Enable Output on uo_out
     await send_spi_transaction(dut, 1, 0x02, 0xFF)  # Enable PWM on uo_out
-    await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Enable Output on uio_out
-    await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Enable PWM on uio_out
+    # await send_spi_transaction(dut, 1, 0x01, 0xFF)  # Enable Output on uio_out
+    # await send_spi_transaction(dut, 1, 0x03, 0xFF)  # Enable PWM on uio_out
     await send_spi_transaction(dut, 1, 0x04, 0x80)  # Set Duty Cycle (50% of 255)
     await ClockCycles(dut.clk, 5)
 

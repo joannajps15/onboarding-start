@@ -155,11 +155,11 @@ async def rising_edge(dut, signal):
     """Wait for the signal to go high"""
     prev = int(signal.value) & 1
     while True:
-        await ClockCycles(dut.clk, 5)
+        await ClockCycles(dut.clk, 1)
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
             return        
-        dut._log.info(f"prev: {prev} | curr: {curr}")
+        # dut._log.info(f"prev: {prev} | curr: {curr}")
         prev = curr
         
 # Falling Edge Detection
@@ -167,11 +167,11 @@ async def falling_edge(dut, signal):
     """Wait for the signal to go high"""
     prev = int(signal.value) & 1
     while True:
-        await ClockCycles(dut.clk, 5)
+        await ClockCycles(dut.clk, 1)
         curr = int(signal.value) & 1
         if prev == 1 and curr == 0:
             return
-        dut._log.info(f"prev: {prev} | curr: {curr}")
+        # dut._log.info(f"prev: {prev} | curr: {curr}")
         prev = curr
 
 # Frequency verification (~3 kHz +/- 1%).

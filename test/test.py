@@ -158,6 +158,7 @@ async def rising_edge(dut, signal):
         await ClockCycles(dut.clk, 5)
         curr = int(signal.value) & 1
         if prev == 0 and curr == 1:
+            dut._log.info("rising edge detected!!")
             return
         prev = curr
 
@@ -169,6 +170,7 @@ async def falling_edge(dut, signal):
         await ClockCycles(dut.clk, 5)
         curr = int(signal.value) & 1
         if prev == 1 and curr == 0:
+            dut._log.info("falling edge detected!")
             return
         prev = curr
 

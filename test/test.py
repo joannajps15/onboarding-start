@@ -262,7 +262,7 @@ async def duty_cycle_calc(dut, mode, pwm_duty_cycle):
 # Duty cycle sweep (0x00 to 0xFF).
 # Interaction between Output Enable and PWM Enable registers.
 # PWM Duty verification (+/-1%).
-# @cocotb.test()
+@cocotb.test()
 async def test_pwm_duty(dut):
     dut._log.info("Start PWM Duty Cycle test")
 
@@ -291,6 +291,7 @@ async def test_pwm_duty(dut):
 
     # Send Signals to SPI Peripheral and Analyze Duty Cycle from output
     for i in range(0, 255, 5):
+        dut._log.info(f"Duty Cycle: {i}")
         await send_spi_transaction(dut, 1, 0x04, i)  # Update duty cycle
         await ClockCycles(dut.clk, 5) # Buffer for duty cycle update
 
@@ -302,9 +303,10 @@ async def test_pwm_duty(dut):
     
     # special case for 255
     # uo_out PWM signal test
-    dut._log.info("Write transaction, address 0x00, data 0x01")
-    dut._log.info("Observe PWM on uo_out[7:0]")
-  
+    dut._log.info("Duty Cycle: 255") 
+    await send_spi_transaction(dut, 1, 0x03, 0x00) # not PWM mode
+    await ClockCycles(dut.clk, 5) # buffer for update
+
     await rising_edge(dut, dut.uio_out, 0)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     
@@ -313,7 +315,7 @@ async def test_pwm_duty(dut):
 
     await rising_edge(dut, dut.uio_out, 0)
     t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
-
+ 
     high_time = t_falling_edge - t_rising_edge1
     period = t_rising_edge2 - t_rising_edge1
     duty_cycle = (high_time / period) * 100

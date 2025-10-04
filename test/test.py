@@ -151,7 +151,7 @@ async def test_spi(dut):
     dut._log.info("SPI test completed successfully")
 
 # Rising Edge Detection
-async def rising_edge(dut, signal, index):
+async def rising_edge(dut, signal):
     """Wait for the signal to go high"""
     prev = int(signal.value) & 1
     while True:
@@ -160,7 +160,7 @@ async def rising_edge(dut, signal, index):
         if prev == 0 and curr == 1:
             return
         prev = curr
-        dut._log.info(f"prev = {prev} | curr = {curr}")
+        # dut._log.info(f"prev = {prev} | curr = {curr}")
 
 # Falling Edge Detection
 async def falling_edge(dut, signal, index):
@@ -205,19 +205,19 @@ async def test_pwm_freq(dut):
     # Send Signals to SPI Peripheral and Analyze Values in output
     # uo_out PWM signal test
     dut._log.info("Observe PWM on uo_out[7:0]")
-    await rising_edge(dut, dut.uo_out, 0)
+    await rising_edge(dut, dut.uo_out)
     t_rising_edge1 = cocotb.utils.get_sim_time(units="ns")
     dut._log.info("time detected")
     
-    # await cocotb.triggers.RisingEdge(dut.uo_out[0])
-    # t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
-    # dut._log.info("time detected")
+    await rising_edge(dut, dut.uo_out)
+    t_rising_edge2 = cocotb.utils.get_sim_time(units="ns")
+    dut._log.info("time detected")
 
-    # period = (t_rising_edge2 - t_rising_edge1) * 1e-9
-    # freq_1 = 1/period
-    # assert (freq_1 >= 2970 and freq_1 <= 3030) , f"Expected frequency within 3 kHz (1% tolerance), got {freq_1}"
-    # dut._log.info("time")
-    # await ClockCycles(dut.clk, 1000) 
+    period = (t_rising_edge2 - t_rising_edge1) * 1e-9
+    freq_1 = 1/period
+    assert (freq_1 >= 2970 and freq_1 <= 3030) , f"Expected frequency within 3 kHz (1% tolerance), got {freq_1}"
+    dut._log.info("time")
+    await ClockCycles(dut.clk, 1000) 
 
     # #uio_out PWM signal test
     # dut._log.info("Write transaction, address 0x03, data 0x01")
